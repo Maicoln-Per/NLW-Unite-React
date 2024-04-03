@@ -5,9 +5,9 @@ export function AttendeeList() {
         <div>
             <div className="flex gap-3 items-center">
                 <h1 className="text-2xl font-bold">Participantes</h1>
-                <div className="px-3 w-72 py-1.5 border-white/10 bg-transparent rounded-lg text-sm flex items-center gap-3">
+                <div className="px-3 w-72 py-1.5 border-white/10 bg-transparent rounded-lg flex items-center gap-3">
                     <Search className="size-4 text-emerald-300" />
-                    <input className="bg-transparent flex-1 outline-none" placeholder="Buscar participantes..."/>
+                    <input className="bg-transparent flex-1 outline-none h-auto border-0 p-0 text-sm" placeholder="Buscar participantes..."/>
                 </div>
             </div>
 
@@ -16,7 +16,7 @@ export function AttendeeList() {
                     <thead>
                         <tr className="border-b border-white/10">
                             <th className="py-3 px-4 text-sm font-semibold text-left">
-                                <input style={{ width: 64 }} type="checkbox" />
+                                <input style={{ width: 64 }} type="checkbox" className="size-4 bg-black/20 rounded border border-white/10" />
                             </th>
                             <th className="py-3 px-4 text-sm font-semibold text-left">Código</th>
                             <th className="py-3 px-4 text-sm font-semibold text-left">Participantes</th>
@@ -28,15 +28,15 @@ export function AttendeeList() {
                     <tbody>
                         {Array.from({ length: 8 }).map((_, i) => {
                             return (
-                                <tr key={i} className="border-b border-white/10">
+                                <tr key={i} className="border-b border-white/10 hover:bg-white/5">
                                     <td className="py-3 px-4 text-sm text-zinc-300">
-                                        <input type="checkbox" />
+                                        <input type="checkbox" className="size-4 bg-black/20 rounded border border-white/10" />
                                     </td>
                                     <td className="py-3 px-4 text-sm text-zinc-300">12383</td>
                                     <td className="py-3 px-4 text-sm text-zinc-300">
                                         <div className="flex flex-col gap-1">
                                             <span className="font-semibold text-white">Maicoln Pereira de Sousa</span>
-                                            <span>maicolnp@gmail.com</span>
+                                            <span>maicolnlindo@gmail.com</span>
                                         </div>
                                     </td>
                                     <td className="py-3 px-4 text-sm text-zinc-300">7 dias atrás</td>
