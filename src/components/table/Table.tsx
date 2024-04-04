@@ -1,6 +1,6 @@
 import { ComponentProps } from "react";
 
-interface TableProps extends ComponentProps<'table'> {
+interface TableProps extends ComponentProps<"table"> {
 
 }
 

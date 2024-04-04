@@ -14,37 +14,73 @@ import { Table } from "./table/Table"
 import { TableHeader } from "./table/Table-header"
 import { TableCell } from "./table/Table-cell"
 import { TableRow } from "./table/Table-row"
-import { ChangeEvent, useState } from "react"
-import { attendees } from "../data/attendees"
+import { ChangeEvent, useEffect, useState } from "react"
 
 dayjs.extend(relativeTime)
 dayjs.locale('pt-br')
 
+interface Attendee {
+    id: string
+    name: string
+    email: string
+    createAt: string
+    checkedInAt: string | null
+}
+
 export function AttendeeList() {
 
     const [search, setSearch] = useState('')
-    const [page, setPage] = useState(0)
+    //const [page, setPage] = useState(1)
 
-    const totalPages = Math.ceil(attendees.length / 10)
+    const [total, setTotal] = useState(0)
+    const [attendees, setAttendees] = useState<Attendee[]>([])
+
+    const totalPages = Math.ceil(total / 10)
+
+    useEffect(() => {
+        const url = new URL('http://localhost:3333/events/9e9bd979-9d10-4915-b339-3786b1634f33/attendees')
+        
+        url.searchParams.set('pageIndex', String(page - 1))
+
+        if(search.length > 0) {
+            url.searchParams.set('query', search)
+        }
+
+        fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            setAttendees(data.attendees)
+            setTotal(data.total)
+        })
+    }, [page, search])
 
     function onSearchInputChanged(event: ChangeEvent<HTMLInputElement>) {
-        setSearch(event.target.value);
+        setSearch(event.target.value)
+        //setPage(1)
+    
+        const page = 1
     }
 
     function goToNextPage() {
-        setPage(page + 1);
+        //setPage(page + 1);
+
+        const searchParams = new URLSearchParams(window.location.search)
+
+        searchParams.set('page', String(page + 1))
+
+        window.location.search = searchParams.toString()
     }
 
     function goToPreviusPage() {
-        setPage(page - 1);
+        //setPage(page - 1);
     }
 
     function goToFirstPage() {
-        setPage(1);
+        //setPage(1);
     }
 
     function goToLastPage() {
-        setPage(totalPages);
+        //setPage(totalPages);
     }
 
     return (
@@ -53,10 +89,8 @@ export function AttendeeList() {
                 <h1 className="text-2xl font-bold">Participantes</h1>
                 <div className="px-3 w-72 py-1.5 border-white/10 bg-transparent rounded-lg flex items-center gap-3">
                     <Search className="size-4 text-emerald-300" />
-                    <input onChange={onSearchInputChanged} className="bg-transparent flex-1 outline-none h-auto border-0 p-0 text-sm" placeholder="Buscar participantes..."/>
+                    <input onChange={onSearchInputChanged} className="bg-transparent flex-1 outline-none h-auto border-0 p-0 text-sm focus:ring-0" placeholder="Buscar participantes..."/>
                 </div>
-
-                {search}
             </div>
 
             <Table>
@@ -73,7 +107,7 @@ export function AttendeeList() {
                     </TableRow>
                 </thead>
                 <tbody>
-                    {attendees.slice((page - 1) * 10, page * 10).map((attendee) => {
+                    {attendees.map((attendee) => {
                         return (
                             <TableRow key={attendee.id}>
                                 <TableCell>
@@ -87,7 +121,10 @@ export function AttendeeList() {
                                     </div>
                                 </TableCell>
                                 <TableCell>{dayjs().to(attendee.createAt)}</TableCell>
-                                <TableCell>{dayjs().to(attendee.checkedInAt)}</TableCell>
+                                <TableCell>
+                                    {attendee.checkedInAt === null 
+                                    ? <span className="text-zinc-400">Não fez check-in</span> 
+                                    : dayjs().to(attendee.checkedInAt)}</TableCell>
                                 <TableCell>
                                     <IconButton transparent={true}>
                                         <MoreHorizontal className="size-4"/>
@@ -100,7 +137,7 @@ export function AttendeeList() {
                 <tfoot>
                     <TableRow>
                         <TableCell colSpan={3}>
-                            Mostrando 10 de {attendees.length} itens
+                            Mostrando {attendees.length} de {total} itens
                         </TableCell>
                         <TableCell className="text-right" colSpan={3}>
                             <div className="inline-flex items-center gap-8">
