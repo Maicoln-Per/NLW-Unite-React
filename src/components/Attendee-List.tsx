@@ -29,8 +29,26 @@ interface Attendee {
 
 export function AttendeeList() {
 
-    const [search, setSearch] = useState('')
-    //const [page, setPage] = useState(1)
+    const [search, setSearch] = useState(() => {
+        const url = new URL(window.location.toString())
+
+        if(url.searchParams.has('search')) {
+            return url.searchParams.get('search') ?? ''
+        }
+
+        return ''
+
+    })
+    
+    const [page, setPage] = useState(() => {
+        const url = new URL(window.location.toString())
+
+        if(url.searchParams.has('page')) {
+            return Number(url.searchParams.get('page'))
+        }
+
+        return 1
+    })
 
     const [total, setTotal] = useState(0)
     const [attendees, setAttendees] = useState<Attendee[]>([])
@@ -54,33 +72,45 @@ export function AttendeeList() {
         })
     }, [page, search])
 
+    function setCurrentSearch(search: string) {
+        const url = new URL(window.location.toString())
+
+        url.searchParams.set('search', search)
+
+        window.history.pushState({}, "", url)
+
+        setSearch(search)
+    }
+
+    function setCurrentPage (page: number) {
+        const url = new URL(window.location.toString())
+
+        url.searchParams.set('page', String(page))
+
+        window.history.pushState({}, "", url)
+
+        setPage(page)
+    }
+
     function onSearchInputChanged(event: ChangeEvent<HTMLInputElement>) {
-        setSearch(event.target.value)
-        //setPage(1)
-    
-        const page = 1
+        setCurrentSearch(event.target.value)
+        setCurrentPage(1)
     }
 
     function goToNextPage() {
-        //setPage(page + 1);
-
-        const searchParams = new URLSearchParams(window.location.search)
-
-        searchParams.set('page', String(page + 1))
-
-        window.location.search = searchParams.toString()
+        setCurrentPage(page + 1)
     }
 
     function goToPreviusPage() {
-        //setPage(page - 1);
+        setCurrentPage(page - 1)
     }
 
     function goToFirstPage() {
-        //setPage(1);
+        setCurrentPage(1)
     }
 
     function goToLastPage() {
-        //setPage(totalPages);
+        setCurrentPage(totalPages);
     }
 
     return (
@@ -89,7 +119,9 @@ export function AttendeeList() {
                 <h1 className="text-2xl font-bold">Participantes</h1>
                 <div className="px-3 w-72 py-1.5 border-white/10 bg-transparent rounded-lg flex items-center gap-3">
                     <Search className="size-4 text-emerald-300" />
-                    <input onChange={onSearchInputChanged} className="bg-transparent flex-1 outline-none h-auto border-0 p-0 text-sm focus:ring-0" placeholder="Buscar participantes..."/>
+                    <input onChange={onSearchInputChanged} 
+                    value={search}
+                    className="bg-transparent flex-1 outline-none h-auto border-0 p-0 text-sm focus:ring-0" placeholder="Buscar participantes..."/>
                 </div>
             </div>
 
